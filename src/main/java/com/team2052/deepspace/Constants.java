@@ -1,8 +1,6 @@
 package com.team2052.deepspace;
 
 
-import com.team2052.deepspace.auto.AutoMode;
-
 public class Constants {
     //All constant values for the robot code will go in this class.
 
@@ -65,7 +63,7 @@ public class Constants {
         public static final double kMinVelocity = 0.05; //range 0-1: minimum amount of power to overcome static friction
 
         public static final double kMinPointSpacing = 6;
-        public static final AutoMode.StartDirection defaultStartDirection = AutoMode.StartDirection.BACKWARD;
+        //public static final AutoMode.StartDirection defaultStartDirection = AutoMode.StartDirection.BACKWARD;
     }
 
 
