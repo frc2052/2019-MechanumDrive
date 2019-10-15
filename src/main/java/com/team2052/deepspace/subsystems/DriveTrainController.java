@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.kauailabs.navx.frc.AHRS;
 import com.team2052.deepspace.Constants;
 import com.team2052.lib.DriveSignal;
@@ -20,20 +21,20 @@ public class DriveTrainController {
 
     AHRS navXGyro = null;
 
-    public final TalonSRX frontRight;
-    public final TalonSRX frontLeft;
-    public final TalonSRX backRight;
-    public final TalonSRX backLeft;
+    public final VictorSPX frontRight;
+    public final VictorSPX frontLeft;
+    public final VictorSPX backRight;
+    public final VictorSPX backLeft;
 
 
     private Solenoid shifterIn;
     private Solenoid shifterOut;
 
     DriveTrainController(){
-        frontRight = new TalonSRX(Constants.DriveTrain.kDriveFrontRightId);
-        frontLeft = new TalonSRX(Constants.DriveTrain.kDriveFrontLeftId);
-        backRight = new TalonSRX(Constants.DriveTrain.kDriveBackRightId);
-        backLeft = new TalonSRX(Constants.DriveTrain.kDriveBackLeftId);
+        frontRight = new VictorSPX(Constants.DriveTrain.kDriveFrontRightId);
+        frontLeft = new VictorSPX(Constants.DriveTrain.kDriveFrontLeftId);
+        backRight = new VictorSPX(Constants.DriveTrain.kDriveBackRightId);
+        backLeft = new VictorSPX(Constants.DriveTrain.kDriveBackLeftId);
 
 
         frontRight.configFactoryDefault();
@@ -48,7 +49,7 @@ public class DriveTrainController {
         frontRight.setInverted(false);
         frontLeft.setInverted(true);
         backRight.setInverted(false);
-        backLeft.setInverted(true);
+        backLeft.setInverted(false);
 
         frontRight.setSensorPhase(true);
         frontLeft.setSensorPhase(true);
