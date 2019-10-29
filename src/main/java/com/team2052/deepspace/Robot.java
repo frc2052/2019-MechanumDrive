@@ -3,6 +3,7 @@ package com.team2052.deepspace;
 import com.team2052.deepspace.subsystems.DriveTrainController;
 import com.team2052.lib.ControlLoop;
 import com.team2052.lib.DriveHelper;
+import com.team2052.lib.DriveSignal;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -128,11 +129,38 @@ public class Robot extends TimedRobot {
 
     private void driverControlled(){
 
+        double fl, fr, br, bl;
 
-        driveTrain.drive(driveHelper.drive(controls.getDriveTank(), controls.getDriveTurn(), controls.getStrafe(), controls.getQuickTurn()));
+        fl = controls.getDriveTank() + controls.getDriveTurn() + controls.getStrafe();
+        fr = controls.getDriveTank() - controls.getDriveTurn() - controls.getStrafe();
+        bl = controls.getDriveTank() + controls.getDriveTurn() - controls.getStrafe();
+        br = controls.getDriveTank() - controls.getDriveTurn() + controls.getStrafe();
+
+        double max= Math.abs(fl);
+        if (Math.abs(fr) > max) {
+            max = Math.abs(fr);
+        }
+        if (Math.abs(br) > max) {
+            max = Math.abs(br);
+        }
+        if (Math.abs(bl) > max) {
+            max = Math.abs(bl);
+        }
+
+        if (max > 1) {
+            fr = fr/max;
+            fl = fl/max;
+            br = br/max;
+            bl = bl/max;
+        }
+
+        DriveSignal sig = new DriveSignal(fl, fr, bl, br, 0);
+
+//        driveTrain.drive(driveHelper.drive(controls.getDriveTank(), controls.getDriveTurn(), controls.getStrafe(), controls.getQuickTurn()));
+        driveTrain.drive(sig);
         robotstate.outputToSmartDashboard();
         //legClimberController.printEncoder();
-
+            System.out.println("FL =  " + fl);
             }
         }
 
