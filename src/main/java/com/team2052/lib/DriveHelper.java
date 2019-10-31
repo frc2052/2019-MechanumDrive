@@ -17,11 +17,13 @@ public class DriveHelper {
      * overrides constant-curvature turning for turn-in-place maneuvers.
      */
     public DriveSignal drive(double throttle, double wheel, double strafe, boolean isQuickTurn) {
+        //the turn and tank is itself unless it is less than the deadband(deadzone), then it is zero
         wheel = handleDeadband(wheel, kWheelDeadband);
         throttle = handleDeadband(throttle, kThrottleDeadband);
 
         double overPower;
 
+        //the value for the turning power
         double angularPower;
 
         if (isQuickTurn) {
