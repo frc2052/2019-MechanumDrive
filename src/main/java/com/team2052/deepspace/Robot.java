@@ -1,12 +1,9 @@
 package com.team2052.deepspace;
 
-import com.team2052.deepspace.auto.AutoMode;
-import com.team2052.deepspace.auto.AutoModeRunner;
-import com.team2052.deepspace.auto.AutoModeSelector;
-import com.team2052.deepspace.auto.PurePursuitPathFollower;
 import com.team2052.deepspace.subsystems.DriveTrainController;
 import com.team2052.lib.ControlLoop;
 import com.team2052.lib.DriveHelper;
+import com.team2052.lib.DriveSignal;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -23,7 +20,6 @@ public class Robot extends TimedRobot {
     private DriveTrainController driveTrain = null;
     private RobotState robotstate = RobotState.getInstance();
     private RobotStateCalculator robotStateCalculator = RobotStateCalculator.getInstance();
-    private AutoModeRunner autoModeRunner = null;
     private ControlLoop controlLoop = new ControlLoop(Constants.Autonomous.kloopPeriodSec);
     private Compressor compressor = null;
 
@@ -34,16 +30,15 @@ public class Robot extends TimedRobot {
         driveTrain = DriveTrainController.getInstance();
         controlLoop.addLoopable(robotStateCalculator);
 
-        autoModeRunner = AutoModeRunner.getInstance();
         try {
             compressor = new Compressor();
             compressor.setClosedLoopControl(true);
         } catch (Exception exc) {
             System.out.println("DANGER: No compressor!");
         }
-        AutoModeSelector.putToShuffleBoard();
+        //AutoModeSelector.putToShuffleBoard();
 
-        AutoModeSelector.nullSelectedAutoMode();
+        //AutoModeSelector.nullSelectedAutoMode();
     }
 
     /**
@@ -66,16 +61,6 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         controlLoop.start();
         driveTrain.zeroGyro();
-
-        AutoMode currentMode = AutoModeSelector.getSelectedAutoMode();
-        System.out.println("selected :" + currentMode.getClass().getName());
-        //use the instance to get direction and position
-        //todo: make one direction enum
-        robotStateCalculator.setStartDirection(currentMode.getStartDirection().isForward);
-        robotStateCalculator.resetRobotState(AutoModeSelector.getStartingPos());
-        System.out.println("starting x: " + robotstate.getLatestPosition().getLateral() + " y: "+ robotstate.getLatestPosition().getForward());
-        //start running the auto mode
-        autoModeRunner.start(currentMode);
     }
 
     /**
@@ -84,16 +69,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        robotstate.outputToSmartDashboard();
-        if(controls.getAutoOverride()){
-            autoModeRunner.stop();
-            driveTrain.stop();
-        }
-        System.out.println("is auto done: " + autoModeRunner.isFinished());
 
-        if(autoModeRunner.isFinished()){
-            driverControlled();
-        }
     }
 
     /**
@@ -101,7 +77,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopInit(){
-        AutoModeSelector.nullSelectedAutoMode();
         robotStateCalculator.resetRobotState();
         controlLoop.start();
         driveTrain.zeroGyro();
@@ -125,36 +100,44 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic(){
-        autoModeRunner.stop();
         controlLoop.stop();
         driveTrain.stop();
-        AutoModeSelector.getSelectedAutoMode();
-        PurePursuitPathFollower.getInstance().resetPathFollower();
     }
 
     private void driverControlled(){
 
+        double fl, fr, br, bl;
 
-        driveTrain.drive(driveHelper.drive(controls.getDriveTank(), controls.getDriveTurn(), controls.getStrafe(), controls.getQuickTurn()));
+        fl = controls.getDriveTank() + controls.getDriveTurn() + controls.getStrafe();
+        fr = controls.getDriveTank() - controls.getDriveTurn() - controls.getStrafe();
+        bl = controls.getDriveTank() + controls.getDriveTurn() - controls.getStrafe();
+        br = controls.getDriveTank() - controls.getDriveTurn() + controls.getStrafe();
+
+        double max= Math.abs(fl);
+        if (Math.abs(fr) > max) {
+            max = Math.abs(fr);
+        }
+        if (Math.abs(br) > max) {
+            max = Math.abs(br);
+        }
+        if (Math.abs(bl) > max) {
+            max = Math.abs(bl);
+        }
+
+        if (max > 1) {
+            fr = fr/max;
+            fl = fl/max;
+            br = br/max;
+            bl = bl/max;
+        }
+
+        DriveSignal sig = new DriveSignal(fl, fr, bl, br, 0);
+
+        //driveTrain.drive(driveHelper.drive(controls.getDriveTank(), controls.getDriveTurn(), controls.getStrafe(), controls.getQuickTurn()));
+        driveTrain.drive(sig);
         robotstate.outputToSmartDashboard();
-        //legClimberController.printEncoder();
-
+            System.out.println("FL =  " + fl);
             }
         }
 
-
-//        if(false && controls.getAutoInterrupt()){
-//            AutoMode currentMode;
-//            if(robotstate.getLatestPosition().getLateral() < 0) {
-//                currentMode = new TeleopLeftTest(robotstate.getLatestPosition());
-//            }else{
-//                currentMode = new TeleopRightTest(robotstate.getLatestPosition());
-//            }
-//            System.out.println("Teleop return to hatch");
-//            System.out.println("starting x: " + robotstate.getLatestPosition().getLateral() + " y: "+ robotstate.getLatestPosition().getForward());
-//            //start running the auto mode
-//            autoModeRunner.start(currentMode);
-//        }else if(!autoModeRunner.isFinished()){
-//            autoModeRunner.stop();
-//        }
 

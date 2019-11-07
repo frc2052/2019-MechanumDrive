@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.kauailabs.navx.frc.AHRS;
 import com.team2052.deepspace.Constants;
 import com.team2052.lib.DriveSignal;
@@ -16,24 +17,27 @@ public class DriveTrainController {
 
     // Instance of DriveTrainController class to be created in Robot.java class by running get instance
     private static DriveTrainController singleDriveTrainControllerInstance = new DriveTrainController();
-    public static DriveTrainController getInstance() { return singleDriveTrainControllerInstance; }
+
+    public static DriveTrainController getInstance() {
+        return singleDriveTrainControllerInstance;
+    }
 
     AHRS navXGyro = null;
 
-    public final TalonSRX frontRight;
-    public final TalonSRX frontLeft;
-    public final TalonSRX backRight;
-    public final TalonSRX backLeft;
+    public final VictorSPX frontRight;
+    public final VictorSPX frontLeft;
+    public final VictorSPX backRight;
+    public final VictorSPX backLeft;
 
 
     private Solenoid shifterIn;
     private Solenoid shifterOut;
 
-    DriveTrainController(){
-        frontRight = new TalonSRX(Constants.DriveTrain.kDriveFrontRightId);
-        frontLeft = new TalonSRX(Constants.DriveTrain.kDriveFrontLeftId);
-        backRight = new TalonSRX(Constants.DriveTrain.kDriveBackRightId);
-        backLeft = new TalonSRX(Constants.DriveTrain.kDriveBackLeftId);
+    DriveTrainController() {
+        frontRight = new VictorSPX(Constants.DriveTrain.kDriveFrontRightId);
+        frontLeft = new VictorSPX(Constants.DriveTrain.kDriveFrontLeftId);
+        backRight = new VictorSPX(Constants.DriveTrain.kDriveBackRightId);
+        backLeft = new VictorSPX(Constants.DriveTrain.kDriveBackLeftId);
 
 
         frontRight.configFactoryDefault();
@@ -48,7 +52,7 @@ public class DriveTrainController {
         frontRight.setInverted(false);
         frontLeft.setInverted(true);
         backRight.setInverted(false);
-        backLeft.setInverted(true);
+        backLeft.setInverted(false);
 
         frontRight.setSensorPhase(true);
         frontLeft.setSensorPhase(true);
@@ -57,7 +61,6 @@ public class DriveTrainController {
         backRight.setNeutralMode(NeutralMode.Brake);
         frontLeft.setNeutralMode(NeutralMode.Brake);
         backLeft.setNeutralMode(NeutralMode.Brake);
-
 
 
         try {
@@ -75,14 +78,14 @@ public class DriveTrainController {
             navXGyro = new AHRS(SPI.Port.kMXP);
             //ahrs = new AHRS(SerialPort.Port.kMXP, SerialDataType.kProcessedData, (byte)50);
             navXGyro.enableLogging(true);
-        } catch (RuntimeException ex ) {
+        } catch (RuntimeException ex) {
             DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
             System.out.println("Error instantiating navX MXP:  " + ex.getMessage());
         }
     }
 
-    public void stop(){
-        drive(new DriveSignal(0,0 ,0 ,0, 0));
+    public void stop() {
+        drive(new DriveSignal(0, 0, 0, 0, 0));
     }
 
 
@@ -96,58 +99,58 @@ public class DriveTrainController {
 
     }
 
-    public void driveAutoVelocityControl(double leftVel, double rightVel){
+    public void driveAutoVelocityControl(double leftVel, double rightVel) {
         //in/sec * rot/in * ticks/rot * .1 to get ticks/100ms
         System.out.println("Left Vel = " + leftVel + " right Vel = " + rightVel);
-        frontLeft.set(ControlMode.Velocity, ((leftVel * Constants.DriveTrain.kTicksPerRot)/Constants.DriveTrain.kDriveWheelCircumferenceInches)/3);
-        frontRight.set(ControlMode.Velocity, ((rightVel * Constants.DriveTrain.kTicksPerRot)/Constants.DriveTrain.kDriveWheelCircumferenceInches)/3);
+        frontLeft.set(ControlMode.Velocity, ((leftVel * Constants.DriveTrain.kTicksPerRot) / Constants.DriveTrain.kDriveWheelCircumferenceInches) / 3);
+        frontRight.set(ControlMode.Velocity, ((rightVel * Constants.DriveTrain.kTicksPerRot) / Constants.DriveTrain.kDriveWheelCircumferenceInches) / 3);
 
-        System.out.println("SENSOR VEL:" + frontLeft.getSelectedSensorVelocity() * (1.0/Constants.DriveTrain.kTicksPerRot) * Constants.DriveTrain.kDriveWheelCircumferenceInches * 10);
+        System.out.println("SENSOR VEL:" + frontLeft.getSelectedSensorVelocity() * (1.0 / Constants.DriveTrain.kTicksPerRot) * Constants.DriveTrain.kDriveWheelCircumferenceInches * 10);
 
-
-    }
-
-    public void driveAutoMotionProfileControl(){
 
     }
 
-    private double checkbounds(double Speed){ //this checks to make sure the speed is between 1 & -1
-        if (Speed > 1){
+    public void driveAutoMotionProfileControl() {
+
+    }
+
+    private double checkbounds(double Speed) { //this checks to make sure the speed is between 1 & -1
+        if (Speed > 1) {
             return 1.0;
-        }else if(Speed < -1){
+        } else if (Speed < -1) {
             return -1.0;
-        }else{
+        } else {
             return Speed;
         }
 
     }
 
-    public double getLeftEncoder(){
+    public double getLeftEncoder() {
         SmartDashboard.putNumber("Left Encoder", frontLeft.getSelectedSensorPosition(0));
 
         return frontLeft.getSelectedSensorPosition(0);
     }
-    public double getRightEncoder(){
+
+    public double getRightEncoder() {
         SmartDashboard.putNumber("Right Encoder", frontRight.getSelectedSensorPosition(0));
         return frontRight.getSelectedSensorPosition(0);
     }
 
-    public void resetEncoders(){
+    public void resetEncoders() {
         frontLeft.setSelectedSensorPosition(0, Constants.DriveTrain.kVelocityControlSlot, Constants.DriveTrain.kCANBusConfigTimeoutMS);
         frontRight.setSelectedSensorPosition(0, Constants.DriveTrain.kVelocityControlSlot, Constants.DriveTrain.kCANBusConfigTimeoutMS);
     }
-    
+
     public void zeroGyro() {
         if (navXGyro != null) {
             System.out.println("Reseting Gyro");
             try {
                 navXGyro.reset();
-            } catch  (Exception exc) {
+            } catch (Exception exc) {
                 System.out.println("DANGER: Failed to reset Gyro" + exc.getMessage() + " ---- ");
                 exc.printStackTrace();
             }
-            if (navXGyro.isCalibrating())
-            {
+            if (navXGyro.isCalibrating()) {
                 System.out.println("Gyro still calibrating");
             }
             System.out.println("Gyro reset");
@@ -161,8 +164,7 @@ public class DriveTrainController {
      * @return gyro angle in degrees
      */
     public double getGyroAngleDegrees() {
-        if (navXGyro != null)
-        {
+        if (navXGyro != null) {
             return navXGyro.getAngle(); //NOTE: getAngle tracks all rotations from init, so it can go beyond 360 and -360
         } else {
             System.out.println("DANGER: NO GYRO!!!!");
@@ -171,24 +173,12 @@ public class DriveTrainController {
     }
 
     public double getGyroAngleRadians() {
-        if (navXGyro != null)
-        {
+        if (navXGyro != null) {
             return navXGyro.getAngle() * 0.017453; //NOTE: getAngle tracks all rotations from init, so it can go beyond 2PI and -2PI
         } else {
             System.out.println("DANGER: NO GYRO!!!!");
             return 0;
         }
     }
-    /*
-    // old gyro code
-     public double getOldGyroAngleDegrees() {
-        // It just so happens that the gyro outputs 4x the amount that it actually turned
-        return -gyro.getAngleZ() / 4.0;
-
-    }
-    public double getOldGyroAngleRadians(){
-        return getOldGyroAngleDegrees() * 0.017453;
-    }
-    */
 }
 
