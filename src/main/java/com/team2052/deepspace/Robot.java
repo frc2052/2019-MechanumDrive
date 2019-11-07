@@ -61,16 +61,6 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         controlLoop.start();
         driveTrain.zeroGyro();
-
-       /*// AutoMode currentMode = AutoModeSelector.getSelectedAutoMode();
-       // System.out.println("selected :" + currentMode.getClass().getName());
-        //use the instance to get direction and position
-        //todo: make one direction enum
-        robotStateCalculator.setStartDirection(currentMode.getStartDirection().isForward);
-        robotStateCalculator.resetRobotState(AutoModeSelector.getStartingPos());
-        System.out.println("starting x: " + robotstate.getLatestPosition().getLateral() + " y: "+ robotstate.getLatestPosition().getForward());
-        //start running the auto mode
-        autoModeRunner.start(currentMode);*/
     }
 
     /**
@@ -79,15 +69,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        /*robotstate.outputToSmartDashboard();
-        if(controls.getAutoOverride()){
-            driveTrain.stop();
-        }
-        System.out.println("is auto done: " + autoModeRunner.isFinished());
-
-        if(autoModeRunner.isFinished()){
-            driverControlled();
-            }*/
 
     }
 
@@ -96,7 +77,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopInit(){
-        //AutoModeSelector.nullSelectedAutoMode();
         robotStateCalculator.resetRobotState();
         controlLoop.start();
         driveTrain.zeroGyro();
@@ -120,11 +100,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic(){
-        //autoModeRunner.stop();
         controlLoop.stop();
         driveTrain.stop();
-        //AutoModeSelector.getSelectedAutoMode();
-        //PurePursuitPathFollower.getInstance().resetPathFollower();
     }
 
     private void driverControlled(){
@@ -156,27 +133,11 @@ public class Robot extends TimedRobot {
 
         DriveSignal sig = new DriveSignal(fl, fr, bl, br, 0);
 
-//      driveTrain.drive(driveHelper.drive(controls.getDriveTank(), controls.getDriveTurn(), controls.getStrafe(), controls.getQuickTurn()));
+        //driveTrain.drive(driveHelper.drive(controls.getDriveTank(), controls.getDriveTurn(), controls.getStrafe(), controls.getQuickTurn()));
         driveTrain.drive(sig);
         robotstate.outputToSmartDashboard();
-        //legClimberController.printEncoder();
             System.out.println("FL =  " + fl);
             }
         }
 
-
-//        if(false && controls.getAutoInterrupt()){
-//            AutoMode currentMode;
-//            if(robotstate.getLatestPosition().getLateral() < 0) {
-//                currentMode = new TeleopLeftTest(robotstate.getLatestPosition());
-//            }else{
-//                currentMode = new TeleopRightTest(robotstate.getLatestPosition());
-//            }
-//            System.out.println("Teleop return to hatch");
-//            System.out.println("starting x: " + robotstate.getLatestPosition().getLateral() + " y: "+ robotstate.getLatestPosition().getForward());
-//            //start running the auto mode
-//            autoModeRunner.start(currentMode);
-//        }else if(!autoModeRunner.isFinished()){
-//            autoModeRunner.stop();
-//        }
 

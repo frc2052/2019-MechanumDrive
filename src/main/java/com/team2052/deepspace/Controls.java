@@ -60,21 +60,5 @@ public class Controls {
 
 
 
-    //////elevator//////
-    /*
-    public boolean getElevatorGroundCargo(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorGroundGargoButton);}
-    public boolean getElevatorHatch1(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorHatch1Button);}
-    public boolean getElevatorHatch2(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorHatch2Button);}
-    public boolean getElevatorHatch3(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorHatch3Button);}
-    public boolean getElevatorCargoShipCargo(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorCargoShipCargoButton);}
-    public boolean getElevatorRocketCargo1(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorCargo1Button);}
-    public boolean getElevatorRocketCargo2(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorCargo2Button);}
-    public boolean getElevatorRocketCargo3(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorCargo3Button);}
 
-    public boolean getElevatorAdjustmentUp(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorAdjustmentUpButton);}
-    public boolean getElevatorAdjustmentDown(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorAdjustmentDownButton);}
-
-    public boolean getElevatorEmergencyUp(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorEmergencyUpButton);}
-    public boolean getElevatorEmergencyDown(){return secondaryControlPanel.getRawButton(Constants.Controls.kElevatorEmergencyDownButton);}
-*/
 }

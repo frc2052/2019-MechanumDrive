@@ -26,16 +26,25 @@ public class DriveHelper {
         //the value for the turning power
         double angularPower;
 
+        //if the turn in place button is held
         if (isQuickTurn) {
+            // if tank is less than 20%,
             if (Math.abs(throttle) < 0.2) {
                 double alpha = 0.1;
+                //the quick stop accumulator value is set to: (1-0.1)* quick stop accumulator + 0.1 * the turn speed {using the limit method} * 2
                 mQuickStopAccumulator = (1 - alpha) * mQuickStopAccumulator + alpha * limit(wheel, 1.0) * 2;
             }
+
             overPower = 1.0;
+            //turning power = turn * turn in place speed
             angularPower = wheel * Constants.DriveTrain.kTurnInPlaceSpeed;
         } else {
             overPower = 0.0;
+            //turning power = tank * turn * turn sensitivity - quick stop accumulator
+            //makes the robot turn differently based on the tank and the turn sensitivity, not just the turn
             angularPower = Math.abs(throttle) * wheel * kTurnSensitivity - mQuickStopAccumulator;
+
+            //keeps the quick stop accumulator between -1 and 1
             if (mQuickStopAccumulator > 1) {
                 mQuickStopAccumulator -= 1;
             } else if (mQuickStopAccumulator < -1) {
@@ -45,6 +54,7 @@ public class DriveHelper {
             }
         }
 
+        //sets the right and left speeds based the angular power value and the tank
         double rightPwm = throttle - angularPower;
         double leftPwm = throttle + angularPower;
         if (leftPwm > 1.0) {
@@ -61,6 +71,7 @@ public class DriveHelper {
             rightPwm = -1.0;
         }
 
+        //sets the power of the motors to the left and right power values
         mSignal.frontRightMotorSpeedPercent = rightPwm;
         mSignal.backRightMotorSpeedPercent = rightPwm;
         mSignal.frontLeftMotorSpeedPercent = leftPwm;
@@ -70,10 +81,12 @@ public class DriveHelper {
         return mSignal;
     }
 
+    //if the value is less than the deadband it is zero
     public double handleDeadband(double val, double deadband) {
         return (Math.abs(val) > Math.abs(deadband)) ? val : 0.0;
     }
 
+    //if the value is greater or less than the limit it is set to the limit
     private static double limit(double value, double limit) {
         if (Math.abs(value) > limit) {
             if (value < 0) {
